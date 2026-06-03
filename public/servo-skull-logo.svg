@@ -1,0 +1,27 @@
+<svg width="96" height="120" viewBox="0 0 96 120" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title">
+  <title id="title">Project Servo Skull logo</title>
+  <path d="M20 46C20 22 34 8 49 8C65 8 76 22 76 45V56C76 61 73 65 68 65H28C23 65 20 61 20 56V46Z" fill="#1A1714"/>
+  <path d="M24 47C24 26 35 14 49 14C62 14 72 27 72 47V55C72 58 70 60 67 60H29C26 60 24 58 24 55V47Z" fill="#6F5842"/>
+  <path d="M30 57H67V72H30V57Z" fill="#201A15"/>
+  <path d="M26 72H71V80H26V72Z" fill="#5A4735"/>
+  <path d="M22 80H75V88H22V80Z" fill="#2B241E"/>
+  <path d="M27 88H70V96H27V88Z" fill="#4A382B"/>
+  <path d="M31 96H66V105H31V96Z" fill="#1D1915"/>
+  <path d="M35 105H60L55 117H41L35 105Z" fill="#111111"/>
+  <path d="M32 42C32 36 36 31 43 31H53C60 31 65 36 65 43V50C65 55 62 58 57 58H39C34 58 32 55 32 50V42Z" fill="#120F0D"/>
+  <path d="M34 42C34 37 38 34 43 34H53C58 34 62 38 62 43V49C62 53 60 55 56 55H40C36 55 34 53 34 49V42Z" fill="#8A6A4A"/>
+  <path d="M36 44C36 40 39 37 43 37C48 37 51 40 51 45C51 49 48 52 43 52C39 52 36 49 36 44Z" fill="#0A0A0A"/>
+  <path d="M53 45C53 41 56 38 60 38C64 38 67 41 67 45C67 49 64 52 60 52C56 52 53 49 53 45Z" fill="#0A0A0A"/>
+  <path d="M47 49L52 49L50 58H45L47 49Z" fill="#18120E"/>
+  <path d="M38 60H58V66H38V60Z" fill="#16120F"/>
+  <path d="M39 66H57V71H39V66Z" fill="#3A2B21"/>
+  <path d="M28 35L16 42V53H26" stroke="#1A1714" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M70 34L84 41V53H71" stroke="#1A1714" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M30 22C36 16 44 13 52 14" stroke="#C3A26A" stroke-width="3" stroke-linecap="round" opacity=".55"/>
+  <path d="M68 74C78 77 82 83 80 92C79 100 86 103 91 98" stroke="#141414" stroke-width="4" stroke-linecap="round"/>
+  <path d="M25 94C18 99 17 108 24 115" stroke="#141414" stroke-width="4" stroke-linecap="round"/>
+  <path d="M43 105V117M51 105V120" stroke="#0C0C0C" stroke-width="3" stroke-linecap="round"/>
+  <path d="M17 53C11 52 7 48 7 43C7 38 11 34 16 34" stroke="#34271D" stroke-width="4" stroke-linecap="round"/>
+  <path d="M82 53C88 51 91 47 90 42C89 37 85 34 80 34" stroke="#34271D" stroke-width="4" stroke-linecap="round"/>
+  <path d="M29 79H69M31 88H66M34 96H63" stroke="#A88754" stroke-width="2" stroke-linecap="round" opacity=".55"/>
+</svg>

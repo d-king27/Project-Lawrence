@@ -17,8 +17,11 @@
   "dependencies": {
     "@ai-sdk/anthropic": "latest",
     "@ai-sdk/openai": "latest",
+    "@emotion/react": "latest",
+    "@emotion/styled": "latest",
     "@ai-sdk/react": "latest",
     "@llamaindex/llama-cloud": "latest",
+    "@mui/material": "latest",
     "@pinecone-database/pinecone": "latest",
     "ai": "latest",
     "cohere-ai": "latest",
@@ -29,6 +32,7 @@
     "pdf-parse": "latest",
     "react": "latest",
     "react-dom": "latest",
+    "react-markdown": "latest",
     "vectra": "latest",
     "zod": "latest"
   },

@@ -2,9 +2,9 @@
 warhammer 11th ed llm
 Codex workspace check: I am in `C:\Users\Dan\Documents\Codex\Project-Lawrence` and ready to work on Project-Lawrence with Dan.
 
-# Project Lawrence
+# Project Servo Skull
 
-Project Lawrence is a rules-grounded Warhammer assistant intended to demonstrate a reliable LLM workflow: parse official rules documents, index them, retrieve and rerank relevant passages, stream cited answers, and regression-test answer quality.
+Project Servo Skull is a rules-grounded Warhammer assistant intended to demonstrate a reliable LLM workflow: parse official rules documents, index them, retrieve and rerank relevant passages, stream cited answers, and regression-test answer quality.
 
 ## Current Base
 
@@ -84,3 +84,5 @@ For a local development vector index:
 npm run build:index
 npm run retrieve:test -- "Can a unit charge after advancing?"
 ```
+
+After the local index exists, the chat endpoint retrieves from Vectra, injects the top chunks into the model context, and asks Servo Skull to cite sources with `[S1]`, `[S2]`, etc.

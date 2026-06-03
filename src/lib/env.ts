@@ -24,6 +24,8 @@ export const env = {
   localVectorIndexDir: readEnv("LOCAL_VECTOR_INDEX_DIR") ?? "data/vector-index",
   chunkTargetTokens: Number(readEnv("CHUNK_TARGET_TOKENS") ?? 600),
   chunkOverlapTokens: Number(readEnv("CHUNK_OVERLAP_TOKENS") ?? 100),
+  retrievalTopK: Number(readEnv("RETRIEVAL_TOP_K") ?? 5),
+  retrievalMinScore: Number(readEnv("RETRIEVAL_MIN_SCORE") ?? -1),
   pineconeApiKey: readEnv("PINECONE_API_KEY"),
   pineconeIndex: readEnv("PINECONE_INDEX") ?? "project-lawrence-rules",
   pineconeCloud: readEnv("PINECONE_CLOUD") ?? "aws",
@@ -33,11 +35,11 @@ export const env = {
 };
 
 export function getMissingChatEnv() {
-  if (env.anthropicApiKey || env.aiGatewayApiKey) {
+  if (env.anthropicApiKey || env.openaiApiKey || env.aiGatewayApiKey) {
     return [];
   }
 
-  return ["ANTHROPIC_API_KEY or AI_GATEWAY_API_KEY"];
+  return ["ANTHROPIC_API_KEY, OPENAI_API_KEY, or AI_GATEWAY_API_KEY"];
 }
 
 export function getMissingIngestionEnv() {

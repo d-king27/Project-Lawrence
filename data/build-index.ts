@@ -1,9 +1,9 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { config } from "dotenv";
-import pdfParse from "pdf-parse";
+import { PDFParse } from "pdf-parse";
 
-import { createRuleChunks } from "../src/lib/rules/chunker";
+import { createRuleChunksFromPages, type RulePageText } from "../src/lib/rules/chunker";
 import { embedTexts } from "../src/lib/rules/embeddings";
 import { insertRuleChunks } from "../src/lib/rules/vectra";
 import type { ChunkManifest, RulesIngestManifest } from "../src/lib/rules/types";
@@ -40,8 +40,29 @@ if (!document) {
 
 const pdfPath = path.resolve(document.localPath);
 const pdfBuffer = await readFile(pdfPath);
-const parsedPdf = await pdfParse(pdfBuffer);
-const chunks = createRuleChunks(parsedPdf.text, document, {
+const parser = new PDFParse({ data: pdfBuffer });
+const parsedPdf = await parser.getText();
+const totalPages = Number(parsedPdf.total ?? 0);
+const pages: RulePageText[] = [];
+
+if (totalPages > 0) {
+  for (let pageNumber = 1; pageNumber <= totalPages; pageNumber += 1) {
+    const page = await parser.getText({ partial: [pageNumber] });
+    pages.push({
+      pageNumber,
+      text: page.text,
+    });
+  }
+} else {
+  pages.push({
+    pageNumber: 1,
+    text: parsedPdf.text,
+  });
+}
+
+await parser.destroy();
+
+const chunks = createRuleChunksFromPages(pages, document, {
   targetTokens: chunkTargetTokens,
   overlapTokens: chunkOverlapTokens,
 });
@@ -50,7 +71,7 @@ if (chunks.length === 0) {
   throw new Error(`No text chunks were created from ${pdfPath}.`);
 }
 
-console.log(`Extracted ${parsedPdf.numpages} pages from ${document.title}`);
+console.log(`Extracted ${parsedPdf.total ?? "unknown"} pages from ${document.title}`);
 console.log(`Created ${chunks.length} chunks. Embedding with ${embeddingModel}...`);
 
 const embeddings = await embedTexts({

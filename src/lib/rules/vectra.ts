@@ -11,7 +11,17 @@ export type RuleVectorMetadata = Record<string, string | number | boolean> & Rul
 const localIndexConfig = {
   version: 1,
   metadata_config: {
-    indexed: ["documentId", "title", "chunkId", "chunkIndex", "sha256"],
+    indexed: [
+      "documentId",
+      "title",
+      "chunkId",
+      "chunkIndex",
+      "pageStart",
+      "pageEnd",
+      "paragraphStart",
+      "paragraphEnd",
+      "sha256",
+    ],
   },
 };
 

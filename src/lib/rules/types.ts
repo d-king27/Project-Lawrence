@@ -20,6 +20,10 @@ export type RuleChunkMetadata = {
   localPath: string;
   sha256: string;
   chunkIndex: number;
+  pageStart: number;
+  pageEnd: number;
+  paragraphStart: number;
+  paragraphEnd: number;
   tokenEstimate: number;
 };
 
