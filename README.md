@@ -29,8 +29,58 @@ npm install
 npm run dev
 ```
 
+## Environment Setup
+
+Copy `.env.example` into `.env.local` and fill in the services you are actively using.
+
+Chat needs one of:
+
+- `ANTHROPIC_API_KEY` with `ANTHROPIC_MODEL`
+- `AI_GATEWAY_API_KEY` with `AI_GATEWAY_MODEL`
+
+Embeddings need:
+
+- `OPENAI_API_KEY`
+- `OPENAI_EMBEDDING_MODEL`
+- `LOCAL_VECTOR_INDEX_DIR`
+- `CHUNK_TARGET_TOKENS`
+- `CHUNK_OVERLAP_TOKENS`
+
+Rules ingestion needs:
+
+- `LLAMA_CLOUD_API_KEY`
+- `CORE_RULES_PDF_URL`
+- `RULES_DOWNLOAD_DIR`
+- `RULES_PDF_PATH`
+- `PARSED_RULES_OUTPUT_DIR`
+
+Retrieval needs:
+
+- `PINECONE_API_KEY`
+- `PINECONE_INDEX`
+- `PINECONE_CLOUD`
+- `PINECONE_REGION`
+- `COHERE_API_KEY`
+
+Evaluation needs:
+
+- `CONFIDENT_API_KEY`
+
 For parsing:
 
 ```bash
 RULES_PDF_PATH="path/to/rules.pdf" npm run parse:rules
+```
+
+For one-off ingestion of the current Core Rules PDF:
+
+```bash
+npm run ingest
+```
+
+For a local development vector index:
+
+```bash
+npm run build:index
+npm run retrieve:test -- "Can a unit charge after advancing?"
 ```

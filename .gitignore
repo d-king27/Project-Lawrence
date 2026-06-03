@@ -6,6 +6,9 @@ coverage
 .env
 .env*.local
 !.env.example
+data/raw-rules
+data/parsed-rules
+data/vector-index
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

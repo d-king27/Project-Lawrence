@@ -1,5 +1,7 @@
+import { anthropic } from "@ai-sdk/anthropic";
 import { openai } from "@ai-sdk/openai";
 import { convertToModelMessages, streamText, type UIMessage } from "ai";
+import { env, getMissingChatEnv } from "@/lib/env";
 
 export const maxDuration = 30;
 
@@ -17,9 +19,22 @@ Rules for answering:
 
 export async function POST(req: Request) {
   const { messages }: { messages: UIMessage[] } = await req.json();
-  const model = process.env.OPENAI_API_KEY
-    ? openai(process.env.OPENAI_MODEL ?? "gpt-5.1-mini")
-    : (process.env.AI_GATEWAY_MODEL ?? "openai/gpt-5.1-mini");
+  const missingEnv = getMissingChatEnv();
+
+  if (missingEnv.length > 0) {
+    return Response.json(
+      {
+        error: `Missing chat environment setting: ${missingEnv.join(", ")}`,
+      },
+      { status: 500 },
+    );
+  }
+
+  const model = env.anthropicApiKey
+    ? anthropic(env.anthropicModel)
+    : env.openaiApiKey
+      ? openai(env.openaiModel)
+      : env.aiGatewayModel;
 
   const result = streamText({
     model,

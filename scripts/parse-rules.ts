@@ -1,8 +1,10 @@
-import "dotenv/config";
-
 import fs from "node:fs";
 import path from "node:path";
+import { config } from "dotenv";
 import LlamaCloud from "@llamaindex/llama-cloud";
+
+config({ path: ".env.local" });
+config();
 
 const rulesPdfPath = process.env.RULES_PDF_PATH;
 

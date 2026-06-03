@@ -9,9 +9,13 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
+    "ingest": "tsx data/ingest.ts",
+    "build:index": "tsx data/build-index.ts",
+    "retrieve:test": "tsx data/retrieve-test.ts",
     "parse:rules": "tsx scripts/parse-rules.ts"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "latest",
     "@ai-sdk/openai": "latest",
     "@ai-sdk/react": "latest",
     "@llamaindex/llama-cloud": "latest",
@@ -21,12 +25,16 @@
     "dotenv": "latest",
     "lucide-react": "latest",
     "next": "latest",
+    "openai": "latest",
+    "pdf-parse": "latest",
     "react": "latest",
     "react-dom": "latest",
+    "vectra": "latest",
     "zod": "latest"
   },
   "devDependencies": {
     "@types/node": "latest",
+    "@types/pdf-parse": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
     "deepeval-ts": "latest",
