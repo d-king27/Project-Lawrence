@@ -1,5 +1,6 @@
 import { env } from "@/lib/env";
 import { embedText } from "./embeddings";
+import { formatRuleSourceLocation } from "./source-location";
 import { queryRuleChunks, type RuleVectorMetadata } from "./vectra";
 
 export type RetrievedRuleSource = {
@@ -85,7 +86,7 @@ function toRetrievedSource(
     title: String(metadata.title),
     sourceUrl: String(metadata.sourceUrl),
     chunkIndex,
-    location: formatLocation(pageStart, pageEnd, paragraphStart, paragraphEnd),
+    location: formatRuleSourceLocation(pageStart, pageEnd, paragraphStart, paragraphEnd),
     pageStart,
     pageEnd,
     paragraphStart,
@@ -113,24 +114,4 @@ Text:
 ${source.text}`,
     )
     .join("\n\n---\n\n");
-}
-
-function formatLocation(
-  pageStart: number,
-  pageEnd: number,
-  paragraphStart: number,
-  paragraphEnd: number,
-) {
-  if (pageStart !== pageEnd) {
-    return `page ${pageStart} paragraph ${paragraphStart} to page ${pageEnd} paragraph ${paragraphEnd}`;
-  }
-
-  const page =
-    pageStart === pageEnd ? `page ${pageStart}` : `pages ${pageStart}-${pageEnd}`;
-  const paragraph =
-    paragraphStart === paragraphEnd
-      ? `paragraph ${paragraphStart}`
-      : `paragraphs ${paragraphStart}-${paragraphEnd}`;
-
-  return `${page}, ${paragraph}`;
 }

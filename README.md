@@ -86,3 +86,10 @@ npm run retrieve:test -- "Can a unit charge after advancing?"
 ```
 
 After the local index exists, the chat endpoint retrieves from Vectra, injects the top chunks into the model context, and asks Servo Skull to cite sources with `[S1]`, `[S2]`, etc.
+
+For tests:
+
+```bash
+npm test
+npm run test:watch
+```

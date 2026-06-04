@@ -8,6 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "ingest": "tsx data/ingest.ts",
     "build:index": "tsx data/build-index.ts",
@@ -41,10 +43,14 @@
     "@types/pdf-parse": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
+    "@testing-library/jest-dom": "latest",
+    "@testing-library/react": "latest",
     "deepeval-ts": "latest",
     "eslint": "latest",
     "eslint-config-next": "latest",
+    "jsdom": "latest",
     "tsx": "latest",
-    "typescript": "latest"
+    "typescript": "latest",
+    "vitest": "latest"
   }
 }
