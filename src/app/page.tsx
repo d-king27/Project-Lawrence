@@ -1,11 +1,22 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
-import { BookOpen, ExternalLink, FileText, Search, Send, ShieldCheck } from "lucide-react";
+import {
+  BookOpen,
+  ExternalLink,
+  FileText,
+  MessageSquare,
+  Plus,
+  Search,
+  Send,
+  ShieldCheck,
+  Trash2,
+} from "lucide-react";
 import Image from "next/image";
 import { CircularProgress, Skeleton } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import type { UIMessage } from "ai";
 
 type RuleSource = {
   id: string;
@@ -18,6 +29,16 @@ type RuleSource = {
   fullQuote: string;
 };
 
+type StoredChatSession = {
+  id: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+  messages: UIMessage[];
+};
+
+const CHAT_STORAGE_KEY = "project-servo-skull:chat-sessions";
+
 const examples = [
   "Can a unit charge after advancing?",
   "How do objective control rules work?",
@@ -26,11 +47,95 @@ const examples = [
 
 export default function Home() {
   const [input, setInput] = useState("");
-  const { messages, sendMessage, status } = useChat();
+  const [sessions, setSessions] = useState<StoredChatSession[]>([]);
+  const [activeChatId, setActiveChatId] = useState("");
+  const [hasLoadedSessions, setHasLoadedSessions] = useState(false);
+  const { messages, sendMessage, status, setMessages } = useChat({ id: activeChatId || "default-chat" });
   const isWorking = status === "submitted" || status === "streaming";
   const latestAssistantMessage = [...messages].reverse().find((message) => message.role === "assistant");
   const showThinkingState =
     status === "submitted" || (isWorking && messages[messages.length - 1]?.role === "user");
+  const activeSession = sessions.find((session) => session.id === activeChatId);
+  const sortedSessions = useMemo(
+    () => [...sessions].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)),
+    [sessions],
+  );
+
+  useEffect(() => {
+    const loadedSessions = loadChatSessions();
+    const nextSessions = loadedSessions.length > 0 ? loadedSessions : [createEmptySession()];
+    setSessions(nextSessions);
+    setActiveChatId(nextSessions[0].id);
+    setMessages(nextSessions[0].messages);
+    setHasLoadedSessions(true);
+  }, [setMessages]);
+
+  useEffect(() => {
+    if (!hasLoadedSessions || !activeChatId) {
+      return;
+    }
+
+    setSessions((currentSessions) => {
+      const nextSessions = currentSessions.map((session) =>
+        session.id === activeChatId
+          ? {
+              ...session,
+              title: deriveChatTitle(messages),
+              updatedAt: new Date().toISOString(),
+              messages,
+            }
+          : session,
+      );
+
+      saveChatSessions(nextSessions);
+      return nextSessions;
+    });
+  }, [activeChatId, hasLoadedSessions, messages]);
+
+  function startNewChat() {
+    if (isWorking) {
+      return;
+    }
+
+    const session = createEmptySession();
+    const nextSessions = [session, ...sessions];
+    setSessions(nextSessions);
+    setActiveChatId(session.id);
+    setMessages([]);
+    saveChatSessions(nextSessions);
+  }
+
+  function selectChat(sessionId: string) {
+    if (isWorking || sessionId === activeChatId) {
+      return;
+    }
+
+    const session = sessions.find((item) => item.id === sessionId);
+    if (!session) {
+      return;
+    }
+
+    setActiveChatId(session.id);
+    setMessages(session.messages);
+  }
+
+  function deleteChat(sessionId: string) {
+    if (isWorking) {
+      return;
+    }
+
+    const nextSessions = sessions.filter((session) => session.id !== sessionId);
+    const safeSessions = nextSessions.length > 0 ? nextSessions : [createEmptySession()];
+    const nextActiveSession =
+      sessionId === activeChatId
+        ? safeSessions[0]
+        : safeSessions.find((session) => session.id === activeChatId) ?? safeSessions[0];
+
+    setSessions(safeSessions);
+    setActiveChatId(nextActiveSession.id);
+    setMessages(nextActiveSession.messages);
+    saveChatSessions(safeSessions);
+  }
 
   return (
     <main className="shell">
@@ -43,6 +148,51 @@ export default function Home() {
               <span>Rules-grounded assistant</span>
             </div>
           </div>
+
+          <section className="chatHistory" aria-label="Saved chats">
+            <div className="chatHistoryHeader">
+              <span>Chats</span>
+              <button aria-label="Start new chat" disabled={isWorking} onClick={startNewChat} type="button">
+                <Plus aria-hidden="true" />
+              </button>
+            </div>
+            <div className="chatHistoryList">
+              {sortedSessions.map((session) => (
+                <button
+                  className={`chatHistoryItem ${session.id === activeChatId ? "active" : ""}`}
+                  disabled={isWorking && session.id !== activeChatId}
+                  key={session.id}
+                  onClick={() => selectChat(session.id)}
+                  type="button"
+                >
+                  <MessageSquare aria-hidden="true" />
+                  <span>
+                    <strong>{session.title}</strong>
+                    <small>{formatChatDate(session.updatedAt)}</small>
+                  </span>
+                  <span
+                    className="deleteChatButton"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      deleteChat(session.id);
+                    }}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        deleteChat(session.id);
+                      }
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    title="Delete chat"
+                  >
+                    <Trash2 aria-hidden="true" />
+                  </span>
+                </button>
+              ))}
+            </div>
+          </section>
 
           <div className="sidebarSpacer" />
 
@@ -73,7 +223,7 @@ export default function Home() {
           <header className="chatHeader">
             <div>
               <p className="eyebrow">Warhammer 11th Edition</p>
-              <h1>Rules Console</h1>
+              <h1>{activeSession?.title ?? "Rules Console"}</h1>
             </div>
             <div className="corpusBadge">
               <BookOpen aria-hidden="true" />
@@ -174,7 +324,7 @@ export default function Home() {
   );
 }
 
-function ThinkingMessage() {
+export function ThinkingMessage() {
   return (
     <article className="message assistant loadingMessage">
       <p className="messageRole">Servo Skull</p>
@@ -191,13 +341,88 @@ function ThinkingMessage() {
   );
 }
 
-function StreamingFooter() {
+export function StreamingFooter() {
   return (
     <div className="streamingFooter" aria-live="polite">
       <CircularProgress aria-hidden="true" className="inlineSpinner" size={15} thickness={5} />
       <span>Composing answer</span>
     </div>
   );
+}
+
+export function createEmptySession(): StoredChatSession {
+  const now = new Date().toISOString();
+
+  return {
+    id: `chat-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    title: "New chat",
+    createdAt: now,
+    updatedAt: now,
+    messages: [],
+  };
+}
+
+export function loadChatSessions() {
+  if (typeof window === "undefined") {
+    return [];
+  }
+
+  try {
+    const stored = window.localStorage.getItem(CHAT_STORAGE_KEY);
+    if (!stored) {
+      return [];
+    }
+
+    const parsed = JSON.parse(stored) as { sessions?: StoredChatSession[] } | StoredChatSession[];
+    const sessions = Array.isArray(parsed) ? parsed : parsed.sessions;
+    return Array.isArray(sessions) ? sessions.filter((session) => session.id && session.title) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveChatSessions(sessions: StoredChatSession[]) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.setItem(
+    CHAT_STORAGE_KEY,
+    JSON.stringify({
+      version: 1,
+      sessions,
+    }),
+  );
+}
+
+export function deriveChatTitle(messages: UIMessage[]) {
+  const firstUserMessage = messages.find((message) => message.role === "user");
+  const title = firstUserMessage?.parts
+    .map((part) => (part.type === "text" ? part.text : ""))
+    .join(" ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!title) {
+    return "New chat";
+  }
+
+  return title.length > 44 ? `${title.slice(0, 41)}...` : title;
+}
+
+export function formatChatDate(value: string) {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Saved";
+  }
+
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
 }
 
 function getRuleSources(parts: Array<{ type: string }>) {
@@ -208,7 +433,7 @@ function getRuleSources(parts: Array<{ type: string }>) {
   return Array.isArray(sourcePart?.data) ? sourcePart.data : [];
 }
 
-function SourceCards({ sources }: { sources: RuleSource[] }) {
+export function SourceCards({ sources }: { sources: RuleSource[] }) {
   return (
     <section className="sourceStack" aria-label="Sources used">
       <div className="sourceStackHeader">

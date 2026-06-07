@@ -8,9 +8,32 @@ function readEnv(name: string) {
   return value && value.length > 0 ? value : undefined;
 }
 
+function readNumberEnv(name: string) {
+  const value = readEnv(name);
+  if (!value) {
+    return undefined;
+  }
+
+  const number = Number(value);
+  return Number.isFinite(number) ? number : undefined;
+}
+
+function readBooleanEnv(name: string, fallback: boolean) {
+  const value = readEnv(name);
+  if (!value) {
+    return fallback;
+  }
+
+  return ["1", "true", "yes", "on"].includes(value.toLowerCase());
+}
+
 export const env = {
   anthropicApiKey: readEnv("ANTHROPIC_API_KEY"),
   anthropicModel: readEnv("ANTHROPIC_MODEL") ?? DEFAULT_ANTHROPIC_MODEL,
+  anthropicMaxOutputTokens: readNumberEnv("ANTHROPIC_MAX_OUTPUT_TOKENS") ?? 800,
+  anthropicTemperature: readNumberEnv("ANTHROPIC_TEMPERATURE") ?? 0.1,
+  anthropicTopP: readNumberEnv("ANTHROPIC_TOP_P") ?? 0.9,
+  anthropicPromptCache: readBooleanEnv("ANTHROPIC_PROMPT_CACHE", true),
   openaiApiKey: readEnv("OPENAI_API_KEY"),
   openaiModel: readEnv("OPENAI_MODEL") ?? DEFAULT_OPENAI_MODEL,
   openaiEmbeddingModel: readEnv("OPENAI_EMBEDDING_MODEL") ?? DEFAULT_OPENAI_EMBEDDING_MODEL,

@@ -38,11 +38,14 @@ export async function POST(req: Request) {
 
   const retrievalPrompt = buildRetrievalPrompt(retrieval.context, retrieval.error);
   const sourceSummary = buildSourceSummary(retrieval);
-  const model = env.anthropicApiKey
-    ? anthropic(env.anthropicModel)
-    : env.openaiApiKey
-      ? openai(env.openaiModel)
-      : env.aiGatewayModel;
+  const modelProvider = env.anthropicApiKey ? "anthropic" : env.openaiApiKey ? "openai" : "gateway";
+  const model =
+    modelProvider === "anthropic"
+      ? anthropic(env.anthropicModel)
+      : modelProvider === "openai"
+        ? openai(env.openaiModel)
+        : env.aiGatewayModel;
+  const providerOptions = getProviderOptions(modelProvider);
 
   const modelMessages = await convertToModelMessages(messages);
   const stream = createUIMessageStream({
@@ -68,6 +71,10 @@ export async function POST(req: Request) {
         model,
         system: `${systemPrompt}\n\n${retrievalPrompt}\n\n${sourceSummary}`,
         messages: modelMessages,
+        maxOutputTokens: env.anthropicMaxOutputTokens,
+        temperature: env.anthropicTemperature,
+        topP: env.anthropicTopP,
+        providerOptions,
       });
 
       writer.merge(result.toUIMessageStream());
@@ -75,6 +82,30 @@ export async function POST(req: Request) {
   });
 
   return createUIMessageStreamResponse({ stream });
+}
+
+function getProviderOptions(modelProvider: "anthropic" | "openai" | "gateway") {
+  if (!env.anthropicPromptCache) {
+    return undefined;
+  }
+
+  if (modelProvider === "anthropic") {
+    return {
+      anthropic: {
+        cacheControl: { type: "ephemeral" },
+      },
+    } as const;
+  }
+
+  if (modelProvider === "gateway") {
+    return {
+      gateway: {
+        caching: "auto",
+      },
+    } as const;
+  }
+
+  return undefined;
 }
 
 function getLatestUserMessageText(messages: UIMessage[]) {
